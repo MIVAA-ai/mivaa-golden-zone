@@ -95,29 +95,23 @@ def process_single_field(silver_row, file_name):
     return ingest_into_osdu(silver_row, converted_json, file_name)
 
 def process_field_data_for_gold_zone(file_id, file_name):
-    """
-    Processes field data from silver and transforms it for the gold zone.
-
-    Parameters:
-    - file_id (int): File ID for processing.
-    - file_name (str): Name of the input file.
-
-    Returns:
-    - DataFrame: Combined DataFrame containing all processed field data.
-    """
     df = fetch_and_filter_silver_data(file_id)
 
     if df.empty:
         return pd.DataFrame()  # Return an empty DataFrame if no valid data is found
 
-    # List to store results
     all_results = []
 
     for row in df.itertuples():
         result_df = process_single_field(row, file_name)
         all_results.append(result_df)
 
-    # Combine all results into a single DataFrame
-    df_gold_data = pd.concat(all_results, ignore_index=True)
-    log_gold_data_table(all_results, file_name)
+    if all_results:  # Ensure there is data before concatenating
+        df_gold_data = pd.concat(all_results, ignore_index=True)
+        log_gold_data_table(df_gold_data, file_name)  # Pass DataFrame instead of list
+    else:
+        df_gold_data = pd.DataFrame()
+
+    return df_gold_data
+
 
