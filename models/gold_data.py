@@ -18,13 +18,22 @@ except Exception as e:
 
 
 def log_gold_data_table(df: pd.DataFrame, file_name):
+    if isinstance(df, list):  # Convert list to DataFrame
+        df = pd.DataFrame(df)
+
+    if not isinstance(df, pd.DataFrame):
+        raise TypeError(f"Expected DataFrame, got {type(df)}")
+
+    if df.empty:
+        logger.error("Warning: DataFrame is empty! Nothing to log.")
+        return
+
     if GoldTableModel is None:
         logger.error("GoldTableModel is not defined. Cannot log data.")
         return
 
     with get_session() as session:
         try:
-            print(df)
 
             # Determine the starting ID for the new rows
             max_id = session.query(GoldTableModel.id).order_by(GoldTableModel.id.desc()).first()
@@ -38,7 +47,6 @@ def log_gold_data_table(df: pd.DataFrame, file_name):
 
             # Convert NaN values to None explicitly
             df = df.astype(object).where(pd.notna(df), None)
-            print(df)
 
             # Convert the DataFrame to a list of dictionaries
             data_to_insert = df.to_dict(orient="records")
