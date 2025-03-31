@@ -24,8 +24,10 @@ The **MIVAA Golden Zone** repository is the third phase in the MIVAA data proces
 ### 1. Configuration Setup
 Before running the application, ensure the following configurations are correctly set:
 
-1. Navigate to osdu-config/ (or move it to config/ if needed).
-2. Edit osdu_client.py to ensure correct API keys and endpoints.
+#### A. OSDU Configuration
+
+1. Navigate to `osdu-config/` (or move it to `config/` if needed).
+2. Edit `osdu_client.py` to ensure correct API keys and endpoints.
 3. Example:
 ```json
 {
@@ -38,6 +40,38 @@ Before running the application, ensure the following configurations are correctl
     }
 }
 ```
+
+#### B. Project Configuration
+
+Edit `config/project_config.py` to define project-wide settings and governance metadata.
+
+##### Governance Metadata
+
+**ACL (Access Control List)**:
+- Defines who owns and who can view the data.
+- Sourced dynamically from `PROJECT_CONFIG["ACL"]`
+- Injected into every record before ingestion
+- Can be customized per dataset, project, or environment
+
+```json
+"acl": {
+  "owners": ["data.eng@company.com"],
+  "viewers": ["geo.team@company.com"]
+}
+```
+
+**Legal Tags**:
+- Ensures compliance with data residency laws, GDPR, and internal ownership policies.
+- Pulled from `PROJECT_CONFIG["LEGAL"]`
+
+```json
+"legal": {
+  "legaltags": ["mivaa-northamerica"],
+  "otherRelevantDataCountries": ["US"]
+}
+```
+
+These governance settings ensure each record is aligned with corporate policies and global compliance requirements.
 
 ### 2. Setup the Environment
 
